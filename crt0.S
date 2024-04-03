@@ -21,12 +21,11 @@
 .word __RAM_BASE
 
 /* ---------------------------------------------------------------- */
-.section .text.Reset_Handler
-.weak Reset_Handler
-.type Reset_Handler, %function
+	.section .text.Reset_Handler
+	.weak Reset_Handler
+	.type Reset_Handler, %function
 
 Reset_Handler:
-
 	/* Set stack pointer */
 	la  x2, __stack
 
@@ -70,10 +69,13 @@ zero_loop_end:
 	/* Set argc = argv = 0 */
 	mv  x10, x0
 	mv  x11, x0
+
 	/* Call 'main' */
 	jal main
 	/* Always finish in trap */
 	j   trap
+
+
 
 /* ---------------------------------------------------------------- */
 /* DEFAULT EXCEPTION HANDLER */
@@ -83,6 +85,8 @@ zero_loop_end:
 Default_Handler:
 trap:
 	j trap
+
+
 
 /* ---------------------------------------------------------------- */
 /* EXCEPTION VECTORS */

@@ -6,7 +6,12 @@
 #ifndef __ARCH_GPIO_H__
 #define __ARCH_GPIO_H__
 
-
+/**
+ * (input data)           IDR
+ * (output data)          ODR
+ * (pin mode)            MODE : GPIO_MODE_INPUT / GPIO_MODE_OUTPUT
+ * (output type)        OTYPE : GPIO_OTYPE_PUSHPULL / GPIO_OTYPE_OPENDRAIN
+ */
 
 typedef enum
 {
@@ -21,14 +26,6 @@ typedef enum
 	GPIO_OTYPE_OPENDRAIN
 } GPIO_OTYPE_e;
 
-
-
-/**
- * (input data)           IDR
- * (output data)          ODR
- * (pin mode)            MODE : GPIO_MODE_INPUT / GPIO_MODE_OUTPUT
- * (output type)        OTYPE : GPIO_OTYPE_PUSHPULL / GPIO_OTYPE_OPENDRAIN
- */
 typedef struct
 {
 	union

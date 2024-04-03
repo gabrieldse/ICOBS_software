@@ -1,18 +1,18 @@
-##################################################################
-##################################################################
-######    __    ______   ______   .______        _______.   ######
-######   |  |  /      | /  __  \  |   _  \      /       |   ######
-######   |  | |  ,----'|  |  |  | |  |_)  |    |   (----`   ######
-######   |  | |  |     |  |  |  | |   _  <      \   \       ######
-######   |  | |  `----.|  `--'  | |  |_)  | .----)   |      ######
-######   |__|  \______| \______/  |______/  |_______/       ######
-######                                                      ######
-##################################################################
-##################################################################
-##### MAKEFILE												 #####
-##### Author: Soriano Theo									 #####
-##### Update: 07-06-2022									 #####
-##################################################################
+##########################################################
+##########################################################
+##    __    ______   ______   .______        _______.   ##
+##   |  |  /      | /  __  \  |   _  \      /       |   ##
+##   |  | |  ,----'|  |  |  | |  |_)  |    |   (----`   ##
+##   |  | |  |     |  |  |  | |   _  <      \   \       ##
+##   |  | |  `----.|  `--'  | |  |_)  | .----)   |      ##
+##   |__|  \______| \______/  |______/  |_______/       ##
+##                                                      ##
+##########################################################
+##########################################################
+# MAKEFILE												 #
+# Author: Soriano Theo									 #
+# Update: 23-09-2020									 #
+##########################################################
 
 AS  = riscv32-unknown-elf-as
 CC  = riscv32-unknown-elf-gcc
@@ -21,28 +21,44 @@ LD  = riscv32-unknown-elf-g++
 OBJCOPY = riscv32-unknown-elf-objcopy
 OBJDUMP = riscv32-unknown-elf-objdump
 
-
 # ================================================================
 OUTDIR = output
 OBJDIR = build
 
-PROJECT = testcode_icobs_light
+PROJECT = demo-icobs-light
 
-SRC = crt0.S lib/misc/print.c src/main.c lib/libarch/uart.c lib/libarch/timer.c
+INC = 	lib/ibex \
+ 		lib/misc \
+		lib/arch \
+		lib/libarch \
+		src \
 
-INC = lib/ibex lib/misc lib/arch lib/libarch src
+APP_SRCS := 	crt0.S \
+		lib/misc/print.c \
+		lib/libarch/uart.c \
+		lib/libarch/timer.c \
+		src/main.c \
+
+
+
+SRC := \
+	$(APP_SRCS) \
 
 LIBDIR =
 LDSCRIPT = link.ld
 
+C_CXX_FLAGS = \
+		-Wall -Wextra \
+		-static -mcmodel=medany -O0 \
+		-ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fdce
+
 GFLAGS   = -march=rv32imc -mabi=ilp32
-CFLAGS   = -Wall -Wextra -static -mcmodel=medany -ffunction-sections -fdata-sections -Os -fstrict-volatile-bitfields
-CXXFLAGS = -Wall -Wextra -static -mcmodel=medany -ffunction-sections -fdata-sections -Os -fstrict-volatile-bitfields
+CFLAGS   = $(addprefix -D, $(MACROS)) $(C_CXX_FLAGS)
+CXXFLAGS = $(addprefix -D, $(MACROS)) $(C_CXX_FLAGS) -fno-use-cxa-atexit
 LDFLAGS  = -Wl,--gc-sections -Wl,-Map=$(OUTDIR)/$(PROJECT).map -nostdlib -nostartfiles
 
 OBJ = $(SRC:%=$(OBJDIR)/%.o)
 DEP = $(patsubst %,$(OBJDIR)/%.d,$(filter %.c %.cpp,$(SRC)))
-
 
 # ================================================================
 ifeq ($(OS), Windows_NT)
@@ -82,16 +98,20 @@ $(OBJDIR)/%.cpp.o: %.cpp
 $(OBJDIR)/%.cpp.o: %.cpp $(OBJDIR)/%.cpp.d | $$(@D)/.
 	$(CXX) $< -o $@ -c -MMD -MP $(GFLAGS) $(CXXFLAGS) $(addprefix -I, $(INC))
 
+$(OBJDIR)/%.cc.o: %.cc
+$(OBJDIR)/%.cc.o: %.cc $(OBJDIR)/%.cc.d | $$(@D)/.
+	$(CXX) $< -o $@ -c -MMD -MP $(GFLAGS) $(CXXFLAGS) $(addprefix -I, $(INC))
+
 $(OUTDIR)/$(PROJECT).elf: $(OBJ) | $(OUTDIR)
 	$(LD) $^ -o $@ $(GFLAGS) $(LDFLAGS) $(addprefix -L, $(LIBDIR)) -T $(LDSCRIPT)
 	$(OBJCOPY) $@ -O binary $(OUTDIR)/$(PROJECT).bin
 	$(OBJCOPY) $@ -O ihex $(OUTDIR)/$(PROJECT).hex
-	python3 hex2txt.py --input=$(OUTDIR)/$(PROJECT).hex --coe=$(OUTDIR)/$(PROJECT).coe
 
 
 .PHONY: clean
 clean:
 	$(RRM) $(subst /,\\,$(OBJDIR))
+	$(RRM) $(subst /,\\,$(OUTDIR)) 
 
 
 .PHONY: dump
@@ -102,6 +122,11 @@ dump:
 .PHONY: prep
 prep:
 	$(CC) -E src/main.c $(GFLAGS) $(CFLAGS) $(addprefix -I, $(INC))
+
+
+.PHONY: coe
+coe:
+	python3 hex2txt.py --input=$(OUTDIR)/$(PROJECT).hex --coe=$(OUTDIR)/$(PROJECT).coe
 
 
 .PRECIOUS: $(OBJDIR)/%.d;

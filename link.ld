@@ -12,31 +12,31 @@
 	----------------------------------------------------------
 	Linker script
 	Author: Soriano Theo
-	Update: 07-06-2022
+	Update: 23-09-2020
 	---------------------------------------------------------- */
 
 OUTPUT_ARCH(riscv)
 
 /* required to correctly link newlib nano */
-GROUP(-lnosys -lc_nano -lgcc -lsupc++)
+GROUP(-lnosys -lc_nano -lm_nano -lgcc -lsupc++)
 
 SEARCH_DIR(.)
 /* __DYNAMIC = 0; */
 
-__ROM_BASE = 0x08000000;
-__ROM_SIZE = 0x00001000;
+__ROM_BASE = 0x10000000;
+__ROM_SIZE = 0x00010000;
 
 __RAM_BASE = 0x10010000;
 __RAM_SIZE = 0x00010000;
 
-__STACK_SIZE = 0x00000800;  /* 2K - stack size */
-__HEAP_SIZE  = 0x00000400;  /* 1K - heap size */
+__STACK_SIZE = 0x00002000;  /* 8K - stack size */
+__HEAP_SIZE  = 0x00002000;  /* 8K - heap size */
 
 /* Memory */
 MEMORY
 {
-	ROM (rx)  : ORIGIN = __ROM_BASE, LENGTH = __ROM_SIZE /* ROM1 8 kB */
-    RAM (w)   : ORIGIN = __RAM_BASE, LENGTH = __RAM_SIZE /* RAM2 8 kB */
+	ROM (rx)  : ORIGIN = __ROM_BASE, LENGTH = __ROM_SIZE /* ROM1 512 kB */
+    RAM (w)   : ORIGIN = __RAM_BASE, LENGTH = __RAM_SIZE /* RAM2 512 kB */
 }
 
 /* Sections */

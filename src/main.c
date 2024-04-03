@@ -14,7 +14,6 @@
 // Author: Soriano Theo
 // Update: 23-09-2020
 //-----------------------------------------------------------
-
 #include "system.h"
 
 // Buttons
@@ -41,7 +40,7 @@
 #define SW2        GPIOA.IDRbits.P2
 
 #define _SW3_MODE  GPIOA.MODEbits.P3
-#define SW3        GPIOA.IDRbits.P3
+#define SW3  		GPIOA.MODEbits.P3  
 
 #define _SW4_MODE  GPIOA.MODEbits.P4
 #define SW4        GPIOA.IDRbits.P4
@@ -80,9 +79,8 @@
 #define SW15        GPIOA.IDRbits.P15
 
 //Define the size of each sprite
-#define SPRITE_W_1 95 //W =LARGURA Do sprite
-#define SPRITE_H_1 95 // H = ALTURA Do sprit
-	
+#define SPRITE_W_1 95 // width
+#define SPRITE_H_1 95 // Height
 
 #define SPRITE_W_2 95
 #define SPRITE_H_2 95
@@ -94,7 +92,6 @@
 #define SCREEN_HEIGHT 480
 
 int TIMER_FLAG = 0;
-
 
 static void timer_clock_cb(int code)
 {
@@ -108,8 +105,8 @@ int main(void)
 	RSTCLK.GPIOBEN = 1;
 	RSTCLK.GPIOCEN = 1;
 
-	GPIOB.ODR = 0x0000; 
-	GPIOB.MODER = 0xFFFF;
+	GPIOB.ODR = 0x0000; //  Define as an output
+	GPIOB.MODER = 0xFFFF; // Define as ?????
 
     _BTNU_MODE = GPIO_MODE_INPUT;
 	_BTNL_MODE = GPIO_MODE_INPUT;
@@ -152,8 +149,6 @@ int main(void)
 	MY_VGA.Y1POS = SCREEN_HEIGHT/2;
 	MY_VGA.X2POS = SCREEN_WIDTH-SPRITE_W_2-100;
 	MY_VGA.Y2POS = SCREEN_HEIGHT/2;
-	
-	
 	MY_VGA.X3POS = SCREEN_WIDTH/2;
 	MY_VGA.Y3POS = SCREEN_HEIGHT/2;
 	int8_t dx=3;
@@ -164,6 +159,7 @@ int main(void)
 	/**BOLA - MOVIMENTO AUTOMÁTICO DENTRO DA TELA**/
 	//Verifica os limites da tela
 	//NÃO RESPEITA OS LIMITES LATERAIS
+	
 	if (MY_VGA.X3POS == 0) //Limite do inicio
 	dx = 3; //DIR FINAl
 	else if (MY_VGA.X3POS + SPRITE_W_3>= SCREEN_WIDTH) //limite do final
@@ -197,6 +193,7 @@ int main(void)
 	/** PLAYER 1 **/
 	/* LOCALIZADO A  ESQUERDA  DA TELA USA OS SWITCH FINAIS*/
 	//Verifica se pode mover e movimenta na direção parando nos limites da tela
+	// descomentar
 	if (SW15 && (MY_VGA.Y1POS-5 != 0)&& !SW14) //Switch de fora sobe
 	MY_VGA.Y1POS -= 5; //sobe
 	else if (SW14 && (MY_VGA.Y1POS+5 < SCREEN_HEIGHT-SPRITE_H_1)) // switch de dentro desce
@@ -205,6 +202,7 @@ int main(void)
 	/** PLAYER 2 **/
 	/* LOCALIZADO A  DIREITA  DA TELA USA OS SWITCH INICIAS*/
 	//Verifica se pode mover e movimenta na direção parando nos limites da tela
+	// descomentar
 	if (SW0 && (MY_VGA.Y2POS-5 != 0)&& !SW1) //Switch de fora sobe
 	MY_VGA.Y2POS -= 5; //sobe
 	else if (SW1 && (MY_VGA.Y2POS+5 < SCREEN_HEIGHT-SPRITE_H_2)) // switch de dentro desce
