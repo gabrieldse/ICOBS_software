@@ -14,12 +14,12 @@ void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xsp
 
 // global variable
 // Define the size of each sprite
-#define SPRITE_W_1 95 // width
-#define SPRITE_H_1 95 // Height
-#define SPRITE_W_2 95
-#define SPRITE_H_2 95
-#define SPRITE_W_3 95
-#define SPRITE_H_3 95
+#define SPRITE_W_1 79 // width
+#define SPRITE_H_1 79 // Height
+#define SPRITE_W_2 78
+#define SPRITE_H_2 78
+#define SPRITE_W_3 34
+#define SPRITE_H_3 34
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 int TIMER_FLAG = 0;
@@ -77,14 +77,16 @@ int main(void)
 	{
 		//
         auto_bouncer(&X3POS, &Y3POS, SPRITE_H_3, SPRITE_W_3, &xspeed, &yspeed);
-		auto_bouncer(&X2POS, &Y2POS, SPRITE_H_2, SPRITE_W_2, &xspeed2, &yspeed2);
-		auto_bouncer(&X1POS, &Y1POS, SPRITE_H_1, SPRITE_W_1, &xspeed1, &yspeed1);
-		
-		//updates positons modified by the auto_bouncer to the VGA
 		MY_VGA.X3POS=X3POS;
 		MY_VGA.Y3POS=Y3POS;
+		auto_bouncer(&X2POS, &Y2POS, SPRITE_H_2, SPRITE_W_2, &xspeed2, &yspeed2);
 		MY_VGA.X2POS=X2POS;
 		MY_VGA.Y2POS=Y2POS;
+		auto_bouncer(&X1POS, &Y1POS, SPRITE_H_1, SPRITE_W_1, &xspeed1, &yspeed1);
+		delay_ms(3);
+		//updates positons modified by the auto_bouncer to the VGA
+		
+		
 		MY_VGA.X1POS=X1POS;
 		MY_VGA.Y1POS=Y1POS;
 
