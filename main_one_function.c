@@ -10,7 +10,7 @@
 // static functions
 static void timer_clock_cb(int);
 
-void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xspeed, int *yspeed);
+void auto_bouncer(volatile unsigned int *spritex, volatile unsigned int *spritey, int spriteh, int spritew, int xspeed, int yspeed);
 
 // global variable
 // Define the size of each sprite
@@ -47,49 +47,46 @@ int main(void)
 	set_timer_ms(1, timer_clock_cb, 0);
 
 	MY_VGA.BACK = 0xFFFFFF; // initial background color
-	
 	// sprites initial position
-	MY_VGA.X3POS = SCREEN_WIDTH / 2;
-	MY_VGA.Y3POS = SCREEN_HEIGHT / 2;
-	
-	int X3POS = MY_VGA.X3POS;
-	int Y3POS = MY_VGA.Y3POS;
-	int xspeed = 3;
-	int yspeed = 3;
-
-	MY_VGA.X2POS = SCREEN_WIDTH - SPRITE_W_2 - 100;
-	MY_VGA.Y2POS = SCREEN_HEIGHT / 2;
-	int X2POS = MY_VGA.X2POS;
-	int Y2POS = MY_VGA.Y2POS;
-	int xspeed2 = 3;
-	int yspeed2 = -3;
-
 
 	MY_VGA.X1POS = 100;
 	MY_VGA.Y1POS = SCREEN_HEIGHT / 2;
-	int X1POS = MY_VGA.X1POS;
-	int Y1POS = MY_VGA.Y1POS;
-	int xspeed1 = +3;
-	int yspeed1 = -3;
+	MY_VGA.X2POS = SCREEN_WIDTH - SPRITE_W_2 - 100;
+	MY_VGA.Y2POS = SCREEN_HEIGHT / 2;
+	MY_VGA.X3POS = SCREEN_WIDTH / 2;
+	MY_VGA.Y3POS = SCREEN_HEIGHT / 2;
 
 	// main loop
 	while (1)
 	{
-		//
-        auto_bouncer(&X3POS, &Y3POS, SPRITE_H_3, SPRITE_W_3, &xspeed, &yspeed);
-		auto_bouncer(&X2POS, &Y2POS, SPRITE_H_2, SPRITE_W_2, &xspeed2, &yspeed2);
-		auto_bouncer(&X1POS, &Y1POS, SPRITE_H_1, SPRITE_W_1, &xspeed1, &yspeed1);
+		// auto_bouncer(int spritex,int spritey,int spriteh,int spritew,int xspeed,int yspeed)
 		
-		//updates positons modified by the auto_bouncer to the VGA
-		MY_VGA.X3POS=X3POS;
-		MY_VGA.Y3POS=Y3POS;
-		MY_VGA.X2POS=X2POS;
-		MY_VGA.Y2POS=Y2POS;
-		MY_VGA.X1POS=X1POS;
-		MY_VGA.Y1POS=Y1POS;
+		auto_bouncer(&(MY_VGA.X3POS), &(MY_VGA.X3POS), SPRITE_H_3, SPRITE_W_3, 10, 10);
 
+		/*
+			if (MY_VGA.X3POS == 0)
+			dx = -3;
+			else if (MY_VGA.X3POS + SPRITE_W_3> SCREEN_WIDTH)
+			dx = 3;
+			if (MY_VGA.Y3POS == 0)
+			dy =3;
+			else if (MY_VGA.Y3POS +SPRITE_H_3 > SCREEN_HEIGHT)
+			dy = -3;
+			MY_VGA.X3POS += dx;
+			MY_VGA.Y3POS += dy;
+
+		*/
+
+		// LIMITE SUPERIOR YPOS  = 0
+		// LIMITE INFERIOR YPOS = SCREEN_HEIGHT-SPRITE_H
+
+		// LIMITE INICIO XPOS = 0
+		// LIMITE FINAL XPOS =   SCREEN_WIDTH-SPRITE_W
 
 		/** PLAYER 1 **/
+		/* LOCALIZADO A  ESQUERDA  DA TELA USA OS SWITCH FINAIS*/
+		// Verifica se pode mover e movimenta na direção parando nos limites da tela
+		//  descomentar
 		if (SW15 && (MY_VGA.Y1POS - 5 != 0) && !SW14)					  // Switch de fora sobe
 			MY_VGA.Y1POS -= 5;											  // sobe
 		else if (SW14 && (MY_VGA.Y1POS + 5 < SCREEN_HEIGHT - SPRITE_H_1)) // switch de dentro desce
@@ -98,7 +95,7 @@ int main(void)
 		/** PLAYER 2 **/
 		/* LOCALIZADO A  DIREITA  DA TELA USA OS SWITCH INICIAS*/
 		// Verifica se pode mover e movimenta na direção parando nos limites da tela
-
+		//  descomentar
 		if (SW0 && (MY_VGA.Y2POS - 5 != 0) && !SW1)						 // Switch de fora sobe
 			MY_VGA.Y2POS -= 5;											 // sobe
 		else if (SW1 && (MY_VGA.Y2POS + 5 < SCREEN_HEIGHT - SPRITE_H_2)) // switch de dentro desce
@@ -108,6 +105,39 @@ int main(void)
 			MY_VGA.BACK -= 10;
 		if (BTNU)
 			MY_VGA.BACK += 10;
+
+		/*if (SW4)
+			MY_VGA.X3POS += 3; // DIR FINAl
+		if (SW5)
+			MY_VGA.X3POS -= 3; // DIR INICIO/*
+
+		/*do{
+
+
+			if (SW0)
+			{
+			MY_VGA.X1POS ++;
+			}
+			if (SW1)
+			{
+			MY_VGA.X1POS --;
+			}
+			if (SW3)
+			{
+			MY_VGA.Y2POS ++;
+			}
+			if (SW4)
+			{
+			MY_VGA.Y2POS --;
+			}
+
+		}while(!TIMER_FLAG);
+		*/
+		// if (sameSpot(MY_VGA.X1POS,MY_VGA.X2POS,MY_VGA.Y1POS,MY_VGA.Y2POS))
+		//	myprintf("\n ++++++++++++++++++++++++\nBATIIIIIIIIIIIIIII\n++++++++++++++++++\n");
+
+		TIMER_FLAG = 0;
+		delay_ms(10);
 	}
 	return 0;
 }
@@ -151,24 +181,38 @@ static void timer_clock_cb(int code)
 		last_count = count;
 		count = count+dx;
 		if(count!=last_count){
-			mymyprintf("%d\n",count);
+			myprintf("%d\n",count);
 			GPIOB.ODR = count;
 		}
 	*/
 
 // ----------------- GAME FUNCTIONS --------------------------
 
-void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xspeed, int *yspeed) {
-
-    if (*spritex <= 0 || *spritex + spritew >= SCREEN_WIDTH) {
-        *xspeed = -*xspeed;
+void auto_bouncer(volatile unsigned int *spritex, volatile unsigned int *spritey, int spriteh, int spritew, int xspeed, int yspeed) {
+    if (*spritex <= 0) {
+        xspeed = -xspeed;
     }
-    
-    if (*spritey <= 0 || *spritey + spriteh >= SCREEN_HEIGHT) {
-        *yspeed = -*yspeed;
+    else if (*spritex + spritew >= SCREEN_WIDTH) {
+        xspeed = -xspeed;
     }
+    if (*spritey <= 0) {
+        yspeed = -yspeed;
+    }
+    else if (*spritey + spriteh >= SCREEN_HEIGHT) {
+        yspeed = -yspeed;
+    }
+	 
+	myprintf("-------------------------------\n"); 
+	myprintf("before X: %u\n", *spritex);
+	myprintf("delta X: %d\n", xspeed);
+    *spritex += xspeed;
+    myprintf("after X: %u\n", *spritex);
+	myprintf("-------------------------------\n"); 
 
-    *spritex += *xspeed;
-    *spritey += *yspeed;
+
+	myprintf("before Y: %u\n", *spritey);
+	myprintf("delta Y: %d\n", yspeed);
+    *spritey += yspeed;
+    myprintf("after Y: %u\n", *spritey);
+	myprintf("-------------------------------\n"); 
 }
-

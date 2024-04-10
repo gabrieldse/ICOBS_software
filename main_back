@@ -1,0 +1,110 @@
+#include "system.h"
+
+// Structures for buttons and switches
+typedef struct {
+    volatile uint32_t *mode;
+    volatile uint32_t *idr;
+} Button;
+
+typedef struct {
+    volatile uint32_t *mode;
+    volatile uint32_t *idr;
+} Switch;
+
+// Buttons
+Button buttons[] = {
+    {&GPIOC.MODER, &GPIOC.IDR},
+    // Add more buttons as needed
+};
+
+// Switches
+Switch switches[] = {
+    {&GPIOA.MODER, &GPIOA.IDR},
+    // Add more switches as needed
+};
+
+// Dimensions of sprites and screen
+#define SPRITE_WIDTH  95
+#define SPRITE_HEIGHT 95
+#define SCREEN_WIDTH  640
+#define SCREEN_HEIGHT 480
+
+// Initialize button pins
+void initButtons() {
+    for (int i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++) {
+        // Set button pins to input mode
+        *buttons[i].mode &= ~(0x3 << (2 * 0)); // Clear bits
+    }
+}
+
+// Initialize switch pins
+void initSwitches() {
+    for (int i = 0; i < sizeof(switches) / sizeof(switches[0]); i++) {
+        // Set switch pins to input mode
+        *switches[i].mode &= ~(0x3 << (2 * 0)); // Clear bits
+    }
+}
+
+// Initialize peripherals
+void initPeripherals() {
+    // Initialize GPIO, UART1, etc.
+}
+
+int main(void) {
+    initPeripherals();
+    initButtons();
+    initSwitches();
+    // Other initializations...
+
+    int dx = 0; // Define dx variable for ball movement
+    int dy = 0; // Define dy variable for ball movement
+    int TIMER_FLAG = 0; // Define TIMER_FLAG variable
+
+    while (1) {
+        // Bouton de défilement haut
+        if (*buttons[0].idr)
+            MY_VGA.BACK += 10;
+
+        // Bouton de défilement bas
+        if (*buttons[1].idr)
+            MY_VGA.BACK -= 10;
+
+        // Déplacement automatique de la balle à l'intérieur de l'écran
+        if (MY_VGA.X3POS == 0)
+            dx = 3; // Déplacement vers la droite
+        else if (MY_VGA.X3POS + SPRITE_WIDTH >= SCREEN_WIDTH)
+            dx = -3; // Déplacement vers la gauche
+
+        if (MY_VGA.Y3POS == 0)
+            dy = 5; // Descendre
+        else if (MY_VGA.Y3POS + SPRITE_HEIGHT >= SCREEN_HEIGHT - 1)
+            dy = -5; // Monter
+
+        MY_VGA.X3POS += dx;
+        MY_VGA.Y3POS += dy;
+
+        // Déplacement du joueur 1
+        if (*switches[0].idr && (MY_VGA.Y1POS - 5 != 0) && !(*switches[1].idr)) // Si le switch externe est activé et le switch interne est désactivé
+            MY_VGA.Y1POS -= 5; // Déplacement vers le haut
+        else if (*switches[1].idr && (MY_VGA.Y1POS + 5 < SCREEN_HEIGHT - SPRITE_HEIGHT)) // Si le switch interne est activé
+            MY_VGA.Y1POS += 5; // Déplacement vers le bas
+
+        // Déplacement du joueur 2
+        if (*switches[2].idr && (MY_VGA.Y2POS - 5 != 0) && !(*switches[3].idr)) // Si le switch externe est activé et le switch interne est désactivé
+            MY_VGA.Y2POS -= 5; // Déplacement vers le haut
+        else if (*switches[3].idr && (MY_VGA.Y2POS + 5 < SCREEN_HEIGHT - SPRITE_HEIGHT)) // Si le switch interne est activé
+            MY_VGA.Y2POS += 5; // Déplacement vers le bas
+
+        // Déplacement de la balle par le joueur 1
+        if (*switches[4].idr)
+            MY_VGA.X3POS += 3; // Déplacement vers la droite
+        // Déplacement de la balle par le joueur 2
+        if (*switches[5].idr)
+            MY_VGA.X3POS -= 3; // Déplacement vers la gauche
+
+        TIMER_FLAG = 0;
+        delay_ms(10);
+    }
+
+    return 0;
+}

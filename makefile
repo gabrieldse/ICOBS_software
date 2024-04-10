@@ -38,6 +38,7 @@ APP_SRCS := 	crt0.S \
 		lib/libarch/uart.c \
 		lib/libarch/timer.c \
 		src/main.c \
+		src/bsp.c \
 
 
 
@@ -108,8 +109,8 @@ $(OUTDIR)/$(PROJECT).elf: $(OBJ) | $(OUTDIR)
 	$(OBJCOPY) $@ -O ihex $(OUTDIR)/$(PROJECT).hex
 
 
-.PHONY: clean
-clean:
+.PHONY: clear
+clear:
 	$(RRM) $(subst /,\\,$(OBJDIR))
 	$(RRM) $(subst /,\\,$(OUTDIR)) 
 
