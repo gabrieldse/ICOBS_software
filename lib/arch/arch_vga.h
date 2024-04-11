@@ -10,6 +10,7 @@ typedef struct
    volatile unsigned int Y2POS;
    volatile unsigned int X3POS;
    volatile unsigned int Y3POS;
+   volatile unsigned int X4POS; volatile unsigned int Y4POS; //newimage
 }VGA_PERIPH_t;
 
 #endif

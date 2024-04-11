@@ -14,14 +14,19 @@ void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xsp
 
 // global variable
 // Define the size of each sprite
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 #define SPRITE_W_1 79 // width
 #define SPRITE_H_1 79 // Height
 #define SPRITE_W_2 78
 #define SPRITE_H_2 78
 #define SPRITE_W_3 34
 #define SPRITE_H_3 34
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SPRITE_W_3 34
+#define SPRITE_H_3 34
+#define SPRITE_W_4 34 //newimage
+#define SPRITE_H_4 34
+
 
 int TIMER_FLAG = 0;
 static void timer_clock_cb(int code)
@@ -57,11 +62,10 @@ int main(void)
 	// sprites initial position
 	MY_VGA.X3POS = SCREEN_WIDTH / 2;
 	MY_VGA.Y3POS = SCREEN_HEIGHT / 2;
-
 	int X3POS = MY_VGA.X3POS;
 	int Y3POS = MY_VGA.Y3POS;
-	int xspeed = 3;
-	int yspeed = 3;
+	int xspeed3 = 3;
+	int yspeed3 = 3;
 
 	MY_VGA.X2POS = SCREEN_WIDTH - SPRITE_W_2 - 100;
 	MY_VGA.Y2POS = SCREEN_HEIGHT / 2;
@@ -71,28 +75,33 @@ int main(void)
 	int yspeed2 = -3;
 
 	MY_VGA.X1POS = 100;
-	MY_VGA.Y1POS = SCREEN_HEIGHT / 2;
+	MY_VGA.Y1POS = SCREEN_HEIGHT/ 2;
 	int X1POS = MY_VGA.X1POS;
 	int Y1POS = MY_VGA.Y1POS;
 	int xspeed1 = +3;
 	int yspeed1 = -3;
 
+	//newimage - sprite 4
+	MY_VGA.X4POS = 100;
+	MY_VGA.Y4POS = SCREEN_HEIGHT / 2;
+	int X4POS = MY_VGA.X4POS;
+	int Y4POS = MY_VGA.Y4POS;
+	int xspeed4 = +3;
+	int yspeed4 = -3;
+
 	// main loop
 	while (1)
 	{
 		//
-		auto_bouncer(&X3POS, &Y3POS, SPRITE_H_3, SPRITE_W_3, &xspeed, &yspeed);
-		MY_VGA.X3POS = X3POS;
-		MY_VGA.Y3POS = Y3POS;
-		auto_bouncer(&X2POS, &Y2POS, SPRITE_H_2, SPRITE_W_2, &xspeed2, &yspeed2);
-		MY_VGA.X2POS = X2POS;
-		MY_VGA.Y2POS = Y2POS;
 		auto_bouncer(&X1POS, &Y1POS, SPRITE_H_1, SPRITE_W_1, &xspeed1, &yspeed1);
-		// delay_ms(3);
-		// updates positons modified by the auto_bouncer to the VGA
-
-		MY_VGA.X1POS = X1POS;
-		MY_VGA.Y1POS = Y1POS;
+		MY_VGA.X1POS = X1POS; MY_VGA.Y1POS = Y1POS;
+		auto_bouncer(&X2POS, &Y2POS, SPRITE_H_2, SPRITE_W_2, &xspeed2, &yspeed2);
+		MY_VGA.X2POS = X2POS; MY_VGA.Y2POS = Y2POS;
+		auto_bouncer(&X3POS, &Y3POS, SPRITE_H_3, SPRITE_W_3, &xspeed3, &yspeed3);
+		MY_VGA.X3POS = X3POS; MY_VGA.Y3POS = Y3POS;
+		auto_bouncer(&X4POS, &Y4POS, SPRITE_H_4, SPRITE_W_4, &xspeed4, &yspeed4);
+		MY_VGA.X4POS = X4POS; MY_VGA.Y4POS = Y4POS;
+		
 
 		/** PLAYER 1 **/
 		if (SW15 && (MY_VGA.Y1POS - 5 != 0) && !SW14)					  // Switch de fora sobe
