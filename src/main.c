@@ -22,7 +22,13 @@ void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xsp
 #define SPRITE_H_3 34
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+
 int TIMER_FLAG = 0;
+static void timer_clock_cb(int code)
+{
+	TIMER_FLAG = 1;
+	((void)code);
+}
 
 // main function
 int main(void)
@@ -47,11 +53,11 @@ int main(void)
 	set_timer_ms(1, timer_clock_cb, 0);
 
 	MY_VGA.BACK = 0xFFFFFF; // initial background color
-	
+
 	// sprites initial position
 	MY_VGA.X3POS = SCREEN_WIDTH / 2;
 	MY_VGA.Y3POS = SCREEN_HEIGHT / 2;
-	
+
 	int X3POS = MY_VGA.X3POS;
 	int Y3POS = MY_VGA.Y3POS;
 	int xspeed = 3;
@@ -64,7 +70,6 @@ int main(void)
 	int xspeed2 = 3;
 	int yspeed2 = -3;
 
-
 	MY_VGA.X1POS = 100;
 	MY_VGA.Y1POS = SCREEN_HEIGHT / 2;
 	int X1POS = MY_VGA.X1POS;
@@ -76,20 +81,18 @@ int main(void)
 	while (1)
 	{
 		//
-        auto_bouncer(&X3POS, &Y3POS, SPRITE_H_3, SPRITE_W_3, &xspeed, &yspeed);
-		MY_VGA.X3POS=X3POS;
-		MY_VGA.Y3POS=Y3POS;
+		auto_bouncer(&X3POS, &Y3POS, SPRITE_H_3, SPRITE_W_3, &xspeed, &yspeed);
+		MY_VGA.X3POS = X3POS;
+		MY_VGA.Y3POS = Y3POS;
 		auto_bouncer(&X2POS, &Y2POS, SPRITE_H_2, SPRITE_W_2, &xspeed2, &yspeed2);
-		MY_VGA.X2POS=X2POS;
-		MY_VGA.Y2POS=Y2POS;
+		MY_VGA.X2POS = X2POS;
+		MY_VGA.Y2POS = Y2POS;
 		auto_bouncer(&X1POS, &Y1POS, SPRITE_H_1, SPRITE_W_1, &xspeed1, &yspeed1);
-		delay_ms(3);
-		//updates positons modified by the auto_bouncer to the VGA
-		
-		
-		MY_VGA.X1POS=X1POS;
-		MY_VGA.Y1POS=Y1POS;
+		// delay_ms(3);
+		// updates positons modified by the auto_bouncer to the VGA
 
+		MY_VGA.X1POS = X1POS;
+		MY_VGA.Y1POS = Y1POS;
 
 		/** PLAYER 1 **/
 		if (SW15 && (MY_VGA.Y1POS - 5 != 0) && !SW14)					  // Switch de fora sobe
@@ -110,6 +113,9 @@ int main(void)
 			MY_VGA.BACK -= 10;
 		if (BTNU)
 			MY_VGA.BACK += 10;
+
+		TIMER_FLAG = 0;
+		delay_ms(10);
 	}
 	return 0;
 }
@@ -117,12 +123,6 @@ int main(void)
 void Default_Handler(void)
 {
 	GPIOB.ODR = 0xFFFF;
-}
-
-static void timer_clock_cb(int code)
-{
-	TIMER_FLAG = 1;
-	((void)code);
 }
 
 // Gerenciador de colisão
@@ -160,17 +160,19 @@ static void timer_clock_cb(int code)
 
 // ----------------- GAME FUNCTIONS --------------------------
 
-void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xspeed, int *yspeed) {
+void auto_bouncer(int *spritex, int *spritey, int spriteh, int spritew, int *xspeed, int *yspeed)
+{
 
-    if (*spritex <= 0 || *spritex + spritew >= SCREEN_WIDTH) {
-        *xspeed = -*xspeed;
-    }
-    
-    if (*spritey <= 0 || *spritey + spriteh >= SCREEN_HEIGHT) {
-        *yspeed = -*yspeed;
-    }
+	if (*spritex <= 0 || *spritex + spritew >= SCREEN_WIDTH)
+	{
+		*xspeed = -*xspeed;
+	}
 
-    *spritex += *xspeed;
-    *spritey += *yspeed;
+	if (*spritey <= 0 || *spritey + spriteh >= SCREEN_HEIGHT)
+	{
+		*yspeed = -*yspeed;
+	}
+
+	*spritex += *xspeed;
+	*spritey += *yspeed;
 }
-
