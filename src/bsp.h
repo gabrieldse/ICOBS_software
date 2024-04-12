@@ -3,7 +3,6 @@
 
 
 void BSP_Button_Init();
-
 void BSP_Switch_Init();
 
 
